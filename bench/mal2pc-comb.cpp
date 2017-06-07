@@ -68,6 +68,7 @@ int mal2pc_comb(int port, EmpParty party)
 int main(int argc, char** argv) {
 	int port, party;
 	parse_party_and_port(argv,argc, &party, &port);
+    mal2pc_comb(port, EmpParty(party));
 
 	return 0;	
 }

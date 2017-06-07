@@ -446,13 +446,24 @@ class Malicious2PC { public:
 	void bobInputAlice() {
 		block * tmp = new block[ssp];
 		block * tmp2 = new block[ssp];
+        //std::stringstream ss;
+        //int lim = 16;
+        //std::vector<std::array<block, 2>> ff(lim * ssp);
 		ot->send(seedB[0], seedB[1], n2);
 		for(int i = 0; i < n2; ++i) {
-			for (int j = 0; j < ssp; ++j)
+            for (int j = 0; j < ssp; ++j)
 				tmp[j] = seedB[0][i];
 			prp.Hn(tmp, tmp, i, ssp, tmp2);
 			xorBlocks_arr(tmp, tmp, &B[i*ssp], ssp);
-			io->send_block(tmp, ssp);
+			
+            //if (i < lim) {
+            //    for (int j = 0; j < ssp; ++j)
+            //    {
+            //        //ss << "s0 " << i << " " << j << "  " << tmp[j] << std::endl;
+            //        ff[i * ssp + j][0] = tmp[j];
+            //    }
+            //}
+            io->send_block(tmp, ssp);
 
 			for (int j = 0; j < ssp; ++j)
 				tmp[j] = seedB[1][i];
@@ -460,15 +471,33 @@ class Malicious2PC { public:
 			xorBlocks_arr(tmp, tmp, &B[i*ssp], ssp);
 			xorBlocks_arr2(tmp, tmp, gc_delta, ssp);
 			io->send_block(tmp, ssp);
-		}
 
+            //if (i < lim) {
+            //    for (int j = 0; j < ssp; ++j)
+            //    {
+            //        //ss << "s1 " << i << " " << j << "  " << tmp[j] << std::endl;
+            //        ff[i * ssp + j][1] = tmp[j];
+
+            //    }
+            //}
+		}
+        //int idx = 0, idx2;
+        //    io->recv_data(&idx, sizeof(int));
+        //    io->recv_data(&idx2, sizeof(int));
+        //while (idx != -1)
+        //{
+        //    std::cout << "ss " << idx << "  " << ff[idx * ssp + idx2][0] << " " << ff[idx * ssp + idx2][0] << std::endl;
+        //}
+
+        //std::cout << ss.str() << std::flush;
 		delete [] tmp;
 		delete [] tmp2;
 	}
 
 	bool bobInputBob(bool * b) {
 		block * tmp = new block[ssp];
-		block * tmp3 = new block[ssp];
+        block * tmp3 = new block[ssp];
+        block * tmp3_ = new block[ssp];
 		block * tmp2 = new block[ssp];
 		bool cheat = false;
 		bool * xor_input = new bool[n2];
@@ -478,30 +507,49 @@ class Malicious2PC { public:
 		for(int i = 0; i < n2; ++i) {
 			if (xor_input[i]) {
 				io->recv_block(tmp, ssp);
-				io->recv_block(tmp3, ssp);
+				io->recv_block(tmp3_, ssp);
 			} else  {
-				io->recv_block(tmp3, ssp);
+				io->recv_block(tmp3_, ssp);
 				io->recv_block(tmp, ssp);
 			}
 			for (int j = 0; j < ssp; ++j)
 				tmp[j] = seedB[0][i];
 			prp.Hn(tmp, tmp, i, ssp, tmp2);
-			xorBlocks_arr(tmp3, tmp, tmp3, ssp);
+			xorBlocks_arr(tmp3, tmp, tmp3_, ssp);
 
 			for(int j = 0; j < ssp; ++j) {
 				if(!E[j]) {
 					if (xor_input[i])
 						tmp3[j] = xorBlocks(tmp3[j], gc_delta[j]);
-					if (!block_cmp(&B[i*ssp+j], &tmp3[j], 1))
-						cheat = true;
+                    if (!block_cmp(&B[i*ssp + j], &tmp3[j], 1))
+                    {
+                        //std::cout << "cheat detected @ " << i << " " << j << "   "
+                        //    << "B[i*ssp + j] = " << B[i*ssp + j] << " != " << tmp3[j] << " " << tmp3_[j] << std::endl;
+
+                        //io->send_data(&i, sizeof(int));
+                        //io->send_data(&j, sizeof(int));
+                        cheat = true;
+                    }
+                    else
+                    {
+                        //std::cout << "print  @ " << i << " " << j << "   "
+                        //    << "B[i*ssp + j] = " << B[i*ssp + j] << " != " << tmp3[j] << " " << tmp3_[j]<< std::endl;
+
+                    }
 				} else {
 					B[i*ssp+j] = tmp3[j];
 				}
 			}
 		}
+
+        //int i = -1, j = -1;
+        //io->send_data(&i, sizeof(int));
+        //io->send_data(&j, sizeof(int));
+
 		delete[] tmp;
 		delete[] tmp2;
-		delete[] tmp3;
+        delete[] tmp3;
+        delete[] tmp3_;
 		delete[] xor_input;
 		return cheat;
 	}

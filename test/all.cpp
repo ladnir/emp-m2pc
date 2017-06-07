@@ -12,11 +12,11 @@ int xor_tree(int port, EmpParty party);
 typedef std::pair < std::string, std::function<int(int, EmpParty)>>  Test;
 
 std::vector<Test> tests{
-     Test{ "mal2pc_other  ", mal2pc_other },
+     Test{ "mal2pc        ", mal2pc },
      Test{ "xor_tree      ", xor_tree },
      Test{ "mal           ", mal_main },
      Test{ "ot_xor_tree   ", ot_xor_tree },
-     Test{ "mal2pc        ", mal2pc },
+     Test{ "mal2pc_other  ", mal2pc_other },
      Test{ "mal2pc_comb   ", mal2pc_comb },
      Test{ "mal_decompose ", mal_decompose }
 };
