@@ -1,7 +1,7 @@
 #ifndef MALICIOUS_2PC_H__
 #define MALICIOUS_2PC_H__
-#include <emp-tool>
-#include <emp-ot>
+#include <emp-tool/emp-tool.h>
+#include <emp-ot/emp-ot.h>
 
 template<typename IO, RTCktOpt rt = RTCktOpt::off>
 class Malicious2PC { public:
@@ -9,7 +9,7 @@ class Malicious2PC { public:
 	IO * io;
 	FileIO * fio;
 	MemIO * mio;
-	int party;
+    EmpParty party;
 	int n1, n2, n3;
 	PRG prg, *prgs;
 	PRP prp;
@@ -40,7 +40,9 @@ class Malicious2PC { public:
 	eb_t *C, *D, g1, h1;
 	bn_t bn_r;
 	eb_t g1Tbl[RELIC_EB_TABLE_MAX];
-	Malicious2PC(IO * io, int party, int n1, int _n2, int n3) {
+	Malicious2PC(IO * io, EmpParty party, int n1, int _n2, int n3, block prngSeed)
+        :prg(prngSeed)
+    {
 		initialize_relic();
 		this->n1 = n1;
 		this->n3 = n3;
@@ -53,8 +55,8 @@ class Malicious2PC { public:
 		seedB = new block*[2];
 		seedB[0] = new block[n2]; 
 		seedB[1] = new block[n2];
-		ot = new MOTExtension<IO>(io);
-		cot = new MOTExtension<IO>(io, true);
+		ot = new MOTExtension<IO>(io, prg.random_block());
+		cot = new MOTExtension<IO>(io, prg.random_block(), true);
 		prgs = new PRG[ssp];
 		A = new block[ssp*n1];
 		R = new block[n1*ssp];
@@ -106,7 +108,7 @@ class Malicious2PC { public:
 		io->set_nodelay();
 		bool res = setupBob();
 		bool res1 = setupBobGC(f);
-		return res or res1;
+		return res || res1;
 	}
 	void bob_preload(){
 		int sent = fio->bytes_sent;
@@ -130,7 +132,7 @@ class Malicious2PC { public:
 		bool res2 = bobInputBob(in);
 		gcOnlineBob(f, out);
 		bool res3 = recoverBob();	
-		return res1 or res2 or res3;
+		return res1 || res2 || res3;
 	}
 	void alice_run(void * f, bool * in) {
 		io->set_nodelay();
@@ -149,7 +151,7 @@ class Malicious2PC { public:
 		bool res3 = bobInputBob(in);
 		bool res4 = gcBob(f, out);
 		bool res5 = recoverBob();	
-		return res1 or res2 or res3 or res4 or res5;
+		return res1 || res2 || res3 || res4 || res5;
 	}
 	void setupAlice() {
 		eb_t h,tmp;
@@ -157,7 +159,7 @@ class Malicious2PC { public:
 		io->recv_eb(&h, 1);
 		eb_mul_pre(hTbl, h);
 		prg.random_block(&Delta, 1);
-		PRG prg_tmp(&Delta);
+		PRG prg_tmp(Delta);
 		prg_tmp.random_eb(Delta_eb);
 		prg.random_block(key, ssp);
 		prg.random_block(seed, ssp);
@@ -417,7 +419,7 @@ class Malicious2PC { public:
 						break;
 					}
 				}
-				if (good_result and !output_set) {
+				if (good_result && !output_set) {
 					memcpy(output, tmp_output, n3);
 					memcpy(recover_delta, tmp_delta, n3*sizeof(block));
 					output_set = true;
@@ -470,7 +472,7 @@ class Malicious2PC { public:
 		block * tmp2 = new block[ssp];
 		bool cheat = false;
 		bool * xor_input = new bool[n2];
-		xortree->gen(xor_input, b);
+		xortree->gen(xor_input, b, prg.random_block());
 		ot->recv(seedB[0], xor_input, n2);
 
 		for(int i = 0; i < n2; ++i) {
@@ -620,7 +622,7 @@ class Malicious2PC { public:
 
 					io->recv_block(out2[0], 2);
 					io->recv_block(out2[1], 2);
-					if( (!block_cmp(out[0], out2[0], 2)) and
+					if( (!block_cmp(out[0], out2[0], 2)) && 
 							(!block_cmp(out[0], out2[1], 2)))
 						cheat = true;
 				}
@@ -644,7 +646,7 @@ class Malicious2PC { public:
 		for(int j = 0; j < ssp; ++j) {
 			for(int i = 0; i < n2; ++i)
 				B_loc[i] = B[i*ssp+j];
-			HalfGateGen<IO, rt> gc(io);
+			HalfGateGen<IO, rt> gc(io, prg.random_block());
 			gc.set_delta(gc_delta[j]);
 			local_gc = &gc;
 			xortree->circuit(Bp, B_loc);
@@ -690,7 +692,7 @@ class Malicious2PC { public:
 				B_loc[i] = B[i*ssp+j];
 			if (!E[j]) {
 				CheckIO checkio(io);
-				HalfGateGen<CheckIO, rt> gc(&checkio);
+				HalfGateGen<CheckIO, rt> gc(&checkio, prg.random_block());
 				gc.set_delta(gc_delta[j]);
 				local_gc = &gc;
 				xortree->circuit(Bp, B_loc);
@@ -726,7 +728,7 @@ class Malicious2PC { public:
 						break;
 					}
 				}
-				if (good_result and !output_set) {
+				if (good_result && !output_set) {
 					memcpy(output, tmp_output, n3);
 					memcpy(recover_delta, tmp_delta, n3*sizeof(block));
 					output_set = true;
@@ -775,13 +777,13 @@ class Malicious2PC { public:
 		bool cheat = false;
 		eb_t Omega, D, tmp;
 		if(P1cheat) {
-			PRG prg_tmp(&recovered_delta);
+			PRG prg_tmp(recovered_delta);
 			prg_tmp.random_eb(&Omega);
 			eb_add_norm(h1, h1, Omega);
 		}
 		io->send_eb(&h1, 1);
 		io->recv_block(&Delta, 1);
-		PRG prg_tmp(&Delta);
+		PRG prg_tmp(Delta);
 		prg_tmp.random_eb(&Delta_eb);
 		eb_t h1Tbl[RELIC_EB_TABLE_MAX];
 		eb_sub_norm(h1,h1,Delta_eb);
