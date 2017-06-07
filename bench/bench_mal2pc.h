@@ -1,10 +1,10 @@
-#include <emp-tool>
-#include "malicious/malicious.h"
+#include <emp-tool.h>
+#include "emp-m2pc/malicious.h"
 #include <string>
 using namespace std;
 
 template<RTCktOpt rt = off>
-double bench_mal2pc_all_online(void * f, uint64_t len1, uint64_t len2, uint64_t len3, NetIO * io, uint64_t TIME, uint64_t party) {
+double bench_mal2pc_all_online(void * f, uint64_t len1, uint64_t len2, uint64_t len3, NetIO * io, uint64_t TIME, EmpParty party) {
 	double t = 0;
 	bool * in1 = new bool[len1];
 	for(uint64_t i = 0; i < len1; ++i)
@@ -15,11 +15,12 @@ double bench_mal2pc_all_online(void * f, uint64_t len1, uint64_t len2, uint64_t 
 		in2[i] = true;
 
 	bool * out = new bool[len3];
+    block seed = toBlock(party);
 
 	for(uint64_t k = 0; k < TIME; ++k) {
 		io->sync();
 		double t1 = timeStamp();
-		Malicious2PC <NetIO, rt> mal(io, party, len1, len2, len3);
+		Malicious2PC <NetIO, rt> mal(io, (EmpParty)party, len1, len2, len3, seed);
 		bool res = false;
 		if(party == ALICE) {
 			mal.alice_run(f, in1);
@@ -35,7 +36,7 @@ double bench_mal2pc_all_online(void * f, uint64_t len1, uint64_t len2, uint64_t 
 }
 
 template<RTCktOpt rt = off>
-void bench_mal2pc_with_offline(double t[3], void * f, uint64_t len1, uint64_t len2, uint64_t len3, NetIO * io, uint64_t TIME, uint64_t party) {
+void bench_mal2pc_with_offline(double t[3], void * f, uint64_t len1, uint64_t len2, uint64_t len3, NetIO * io, uint64_t TIME, EmpParty party) {
 	t[0]=t[1]=t[2] = 0;
 	bool * in1 = new bool[len1];
 	for(uint64_t i = 0; i < len1; ++i)
@@ -46,13 +47,14 @@ void bench_mal2pc_with_offline(double t[3], void * f, uint64_t len1, uint64_t le
 		in2[i] = true;
 
 	bool * out = new bool[len3];
+    block seed = toBlock(party);
 
 	for(uint64_t k = 0; k < TIME; ++k) {
 		bool res = false;
 		bool res2 = false;
 		io->sync();
 		double t1 = timeStamp();
-		Malicious2PC<NetIO, RTCktOpt::off> mal(io, party, len1, len2, len3);
+		Malicious2PC<NetIO, RTCktOpt::off> mal(io, (EmpParty) party, len1, len2, len3, seed);
 		if(party == ALICE) {
 			mal.alice_offline(f);
 			t[0] += (timeStamp() - t1);

@@ -116,7 +116,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="emp-sh2pc.h" />
     <ClInclude Include="semihonest\semihonest.h" />
     <ClInclude Include="semihonest\semihonest_eva.h" />
     <ClInclude Include="semihonest\semihonest_gen.h" />

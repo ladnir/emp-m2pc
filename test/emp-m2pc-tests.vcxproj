@@ -19,7 +19,17 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\bench\mal2pc-comb.cpp" />
+    <ClCompile Include="..\bench\mal2pc.cpp" />
+    <ClCompile Include="..\bench\mal2pc_other.cpp" />
+    <ClCompile Include="..\bench\mal_decompose.cpp" />
+    <ClCompile Include="..\bench\ot_xor_tree.cpp" />
+    <ClCompile Include="..\bench\xor-tree.cpp" />
+    <ClCompile Include="all.cpp" />
     <ClCompile Include="mal.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\bench\bench_mal2pc.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
@@ -78,11 +88,11 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProjectDir)../..;$(ProjectDir)../../../relic/include;$(ProjectDir)../../../libOTe/cryptoTools;C:/libs/boost;C:/libs/mpir/lib/x64/$(configuration)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)../../emp-tool;$(ProjectDir)../../emp-ot;$(ProjectDir)..;$(ProjectDir)../../../relic/include;$(ProjectDir)../../../libOTe/cryptoTools;C:/libs/boost;C:/libs/mpir/lib/x64/$(configuration)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
-      <PreprocessorDefinitions>EMP_CIRCUIT_PATH=R"**($(SolutionDir)circuits/files)**";THREADING;_CRT_SECURE_NO_WARNINGS;_WIN32_WINNT=0x0501;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>EMP_CIRCUIT_PATH=R"**($(SolutionDir)/emp-tool/circuits/files)**";THREADING;_CRT_SECURE_NO_WARNINGS;_WIN32_WINNT=0x0501;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(ProjectDir)../../../libOTe/x64/$(Configuration);C:/libs/boost/stage/lib;$(OutDir);C:/libs/mpir/lib/x64/$(configuration);$(ProjectDir)../../../relic/lib/$(Configuration)</AdditionalLibraryDirectories>
@@ -116,11 +126,11 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProjectDir)../..;$(ProjectDir)../../../relic/include;$(ProjectDir)../../../libOTe/cryptoTools;C:/libs/boost;C:/libs/mpir/lib/x64/$(configuration)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)../../emp-tool;$(ProjectDir)../../emp-ot;$(ProjectDir)..;$(ProjectDir)../../../relic/include;$(ProjectDir)../../../libOTe/cryptoTools;C:/libs/boost;C:/libs/mpir/lib/x64/$(configuration)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
-      <PreprocessorDefinitions>EMP_CIRCUIT_PATH=R"**($(SolutionDir)circuits/files)**";THREADING;_CRT_SECURE_NO_WARNINGS;_WIN32_WINNT=0x0501;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>EMP_CIRCUIT_PATH=R"**($(SolutionDir)/emp-tool/circuits/files)**";THREADING;_CRT_SECURE_NO_WARNINGS;_WIN32_WINNT=0x0501;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>

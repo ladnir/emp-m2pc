@@ -1,7 +1,7 @@
 #ifndef MALICIOUS_2PC_H__
 #define MALICIOUS_2PC_H__
-#include <emp-tool/emp-tool.h>
-#include <emp-ot/emp-ot.h>
+#include <emp-tool.h>
+#include <emp-ot.h>
 
 template<typename IO, RTCktOpt rt = RTCktOpt::off>
 class Malicious2PC { public:
@@ -298,7 +298,7 @@ class Malicious2PC { public:
 		for(int j = 0; j < ssp; ++j) {
 			for(int i = 0; i < n2; ++i)
 				B_loc[i] = B[i*ssp+j];
-			HalfGateGen<IO, rt> gc(io);
+			HalfGateGen<IO, rt> gc(io, prg.random_block());
 			gc.set_delta(gc_delta[j]);
 			local_gc = &gc;
 			xortree->circuit(Bp, B_loc);
@@ -343,7 +343,7 @@ class Malicious2PC { public:
 				B_loc[i] = B[i*ssp+j];
 			if (!E[j]) {
 				CheckIO checkio(io);
-				HalfGateGen<CheckIO, rt> gc(&checkio);
+				HalfGateGen<CheckIO, rt> gc(&checkio, prg.random_block());
 				gc.set_delta(gc_delta[j]);
 				local_gc = &gc;
 				xortree->circuit(Bp, B_loc);
