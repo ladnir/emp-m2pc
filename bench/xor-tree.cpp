@@ -5,7 +5,7 @@ using namespace std;
 
 int xor_tree(int port, EmpParty party)
 {
-    PRG prg;
+    PRG prg(ZeroBlock);
     XorTree<> xortree(1 << 20);
     block * blocks = new block[xortree.output_size()];
     block * blocks2 = new block[xortree.input_size()];

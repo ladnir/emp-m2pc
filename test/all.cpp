@@ -12,13 +12,13 @@ int xor_tree(int port, EmpParty party);
 typedef std::pair < std::string, std::function<int(int, EmpParty)>>  Test;
 
 std::vector<Test> tests{
-    Test{ "mal           ", mal_main },
-    // Test{ "mal_decompose ", mal_decompose },
-     Test{ "mal2pc        ", mal2pc },
      Test{ "mal2pc_other  ", mal2pc_other },
-     Test{ "mal2pc_comb   ", mal2pc_comb },
+     Test{ "xor_tree      ", xor_tree },
+     Test{ "mal           ", mal_main },
      Test{ "ot_xor_tree   ", ot_xor_tree },
-     Test{ "xor_tree      ", xor_tree }
+     Test{ "mal2pc        ", mal2pc },
+     Test{ "mal2pc_comb   ", mal2pc_comb },
+     Test{ "mal_decompose ", mal_decompose }
 };
 
 void doTests(osuCrypto::CLP& cmd, int port, EmpParty party, bool print = true)
@@ -31,7 +31,7 @@ void doTests(osuCrypto::CLP& cmd, int port, EmpParty party, bool print = true)
     {
         if (hasTestFlags == false || cmd.isSet(test.first))
         {
-            if(print)std::cout << test.first << std::flush;
+            if (print)std::cout << test.first << std::flush;
             test.second(port, party);
             if (print)std::cout << "passed" << std::endl;
         }

@@ -28,7 +28,11 @@ double bench_mal2pc_all_online(void * f, uint64_t len1, uint64_t len2, uint64_t 
 			res = mal.bob_run(f, in1, out);
 		}
 		t += (timeStamp() - t1);
-		assert(!res);
+		//assert(!res);
+        if (res)
+        {
+            std::cout << "test bench_mal2pc_all_online(...) failed k = " << k << std::endl;
+        }
 	}
 	delete[] in2;
 	delete[] out;
